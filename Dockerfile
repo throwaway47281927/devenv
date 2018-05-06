@@ -152,6 +152,62 @@ RUN sudo apt-get install -y openssh-server && \
     sudo sh -c 'echo "ubuntu:vncpassword" | chpasswd'
 EXPOSE 22
 
+RUN sudo apt-get install -y imagemagick python3 python3-pip python3-dev nano
+RUN pip3 install tensorflow-gpu numpy scipy pillow
+
+# CUDA 9
+ENV CUDA_VERSION 9.0.176
+ENV CUDA_PKG_VERSION 9-0=$CUDA_VERSION-1
+
+RUN sudo apt-get install -y ca-certificates apt-transport-https gnupg-curl
+
+RUN sudo apt-get install -y cuda-cudart-$CUDA_PKG_VERSION
+
+#RUN sudo ln -s cuda-9.0 /usr/local/cuda
+
+# nvidia-docker 1.0
+LABEL com.nvidia.volumes.needed="nvidia_driver"
+LABEL com.nvidia.cuda.version="${CUDA_VERSION}"
+
+RUN echo "/usr/local/nvidia/lib" | sudo tee --append /etc/ld.so.conf.d/nvidia.conf && \
+    echo "/usr/local/nvidia/lib64" | sudo tee --append /etc/ld.so.conf.d/nvidia.conf
+
+ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
+ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
+
+# nvidia-container-runtime
+ENV NVIDIA_VISIBLE_DEVICES all
+ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
+ENV NVIDIA_REQUIRE_CUDA "cuda>=9.0"
+
+ENV CUDNN_VERSION 7.1.2.21
+ENV NCCL_VERSION 2.1.15
+
+RUN sudo apt-get install -y cuda-libraries-$CUDA_PKG_VERSION \
+        libnccl2=$NCCL_VERSION-1+cuda9.0
+
+RUN sudo apt-get install -y cuda-libraries-dev-$CUDA_PKG_VERSION \
+        cuda-nvml-dev-$CUDA_PKG_VERSION \
+        cuda-minimal-build-$CUDA_PKG_VERSION \
+        cuda-command-line-tools-$CUDA_PKG_VERSION \
+        libnccl-dev=$NCCL_VERSION-1+cuda9.0
+
+ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs:${LIBRARY_PATH}
+
+RUN sudo apt-get install -y libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
+    libcudnn7-dev=$CUDNN_VERSION-1+cuda9.0 
+
+# clone
+RUN sudo apt-get install -y jq
+RUN sudo service tor start && \
+    curl -s --socks5-hostname localhost:9050 https://check.torproject.org/api/ip && \
+    git config --global http.proxy 'socks5://127.0.0.1:9050' && \
+    git config --global user.email "you@example.com" && \
+    git config --global user.name "Your Name" && \
+    git clone https://github.com/throwaway47281927/clothed2nude.git && \
+    git clone https://github.com/throwaway47281927/devenv.git
+
+# Run
 ENTRYPOINT sudo service tor start && \
     sudo service ssh start && \
     echo 1 | sudo tee --append /proc/sys/net/ipv4/ip_forward && \
