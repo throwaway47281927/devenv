@@ -198,14 +198,22 @@ RUN sudo apt-get install -y libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
     libcudnn7-dev=$CUDNN_VERSION-1+cuda9.0 
 
 # clone
+RUN pip3 install PySocks
+RUN pip install PySocks beautifulsoup4
+
 RUN sudo apt-get install -y jq
 RUN sudo service tor start && \
-    curl -s --socks5-hostname localhost:9050 https://check.torproject.org/api/ip && \
+#    curl -s --socks5-hostname localhost:9050 https://check.torproject.org/api/ip && \
     git config --global http.proxy 'socks5://127.0.0.1:9050' && \
     git config --global user.email "you@example.com" && \
     git config --global user.name "Your Name" && \
     git clone https://github.com/throwaway47281927/clothed2nude.git && \
-    git clone https://github.com/throwaway47281927/devenv.git
+    git clone https://github.com/throwaway47281927/devenv.git && \
+    cd clothed2nude && \
+    python download.py && \
+    tar -xvf dataset.tar.gz && \
+    mkdir -p datasets && \
+    mv blended/ datasets/
 
 # Run
 ENTRYPOINT sudo service tor start && \
