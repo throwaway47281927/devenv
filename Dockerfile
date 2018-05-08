@@ -201,7 +201,10 @@ RUN sudo apt-get install -y libcudnn7=$CUDNN_VERSION-1+cuda9.0 \
 RUN pip3 install PySocks
 RUN pip install PySocks beautifulsoup4
 
-RUN sudo apt-get install -y jq
+RUN sudo add-apt-repository ppa:graphics-drivers/ppa && \
+    sudo apt-get update && \
+    sudo apt-get install -y jq nvidia-390
+
 RUN sudo service tor start && \
 #    curl -s --socks5-hostname localhost:9050 https://check.torproject.org/api/ip && \
     git config --global http.proxy 'socks5://127.0.0.1:9050' && \
