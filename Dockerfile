@@ -205,6 +205,8 @@ RUN sudo add-apt-repository ppa:graphics-drivers/ppa && \
     sudo apt-get update && \
     sudo apt-get install -y jq nvidia-390
 
+RUN sudo apt-get install -y exif
+
 RUN sudo service tor start && \
 #    curl -s --socks5-hostname localhost:9050 https://check.torproject.org/api/ip && \
     git config --global http.proxy 'socks5://127.0.0.1:9050' && \
@@ -216,7 +218,9 @@ RUN sudo service tor start && \
     python download.py && \
     tar -xvf dataset.tar.gz && \
     mkdir -p datasets && \
-    mv blended/ datasets/
+    mv blended/ datasets/ && \
+    python3 download_original.py && \
+    tar -xvf original.tar.gz
 
 # Run
 ENTRYPOINT sudo service tor start && \
