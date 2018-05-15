@@ -213,13 +213,16 @@ RUN sudo service tor start && \
     git config --global user.email "you@example.com" && \
     git config --global user.name "Your Name" && \
     git clone https://github.com/throwaway47281927/clothed2nude.git && \
-    git clone https://github.com/throwaway47281927/devenv.git && \
+    git clone https://github.com/throwaway47281927/devenv.git
+
+RUN sudo service tor start && \
     cd clothed2nude && \
+    git pull && \
     python download.py && \
     tar -xvf dataset.tar.gz && \
     mkdir -p datasets && \
     mv blended/ datasets/ && \
-    python3 download_original.py && \
+    python download_original.py && \
     tar -xvf original.tar.gz
 
 # Run
