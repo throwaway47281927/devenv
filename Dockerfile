@@ -213,7 +213,8 @@ RUN sudo service tor start && \
     git config --global user.email "you@example.com" && \
     git config --global user.name "Your Name" && \
     git clone https://github.com/throwaway47281927/clothed2nude.git && \
-    git clone https://github.com/throwaway47281927/devenv.git
+    git clone https://github.com/throwaway47281927/devenv.git && \
+    git clone https://github.com/throwaway47281927/Mask_RCNN.git
 
 RUN sudo service tor start && \
     cd clothed2nude && \
