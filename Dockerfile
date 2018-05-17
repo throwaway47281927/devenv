@@ -227,7 +227,22 @@ RUN sudo service tor start && \
     tar -xvf original.tar.gz
 
 RUN sudo service tor start && \
-    cd Mask_RCNN && \
+    sudo chown -R root:ubuntu /usr/local/ && \
+    sudo chmod -R ug+rw /usr/local && \
+    pip install Cython && \
+    git clone https://github.com/waleedka/coco && \
+    cd ~/coco && \
+    echo "installing coco" && \
+    cd ~/coco/PythonAPI && \
+    make && \
+    echo "setup coco" && \
+    python setup.py build_ext install
+
+RUN sudo service tor start && \
+    mv ~/clothed2nude/raw ~/Mask_RCNN/dataset && \
+    mkdir -p ~/Mask_RCNN/out && \
+    cd ~/Mask_RCNN && \
+    sudo apt-get install -y python3-tk && \
     sudo chown -R root:ubuntu /home/ubuntu/.cache/ && \
     sudo chmod -R ug+rw /home/ubuntu/.cache/ && \
     pip install --upgrade pip==9.0.1 && \
@@ -236,6 +251,15 @@ RUN sudo service tor start && \
     pip3 install setuptools --upgrade && \
     sudo pip3 install -r requirements.txt && \
     sudo python3 setup.py install
+
+RUN sudo pip install scikit-image tensorflow tensorflow-gpu && \
+    sudo pip3 install pycocotools && \
+    sudo apt-get install -y python-tk
+
+RUN sudo service tor start && \
+    cd ~/Mask_RCNN && \
+    git pull && \
+    python3 download.py
 
 # Run
 ENTRYPOINT sudo service tor start && \
