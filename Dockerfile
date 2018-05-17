@@ -226,6 +226,17 @@ RUN sudo service tor start && \
     python download_original.py && \
     tar -xvf original.tar.gz
 
+RUN sudo service tor start && \
+    cd Mask_RCNN && \
+    sudo chown -R root:ubuntu /home/ubuntu/.cache/ && \
+    sudo chmod -R ug+rw /home/ubuntu/.cache/ && \
+    pip install --upgrade pip==9.0.1 && \
+    pip3 install --upgrade pip==9.0.1 && \
+    pip install setuptools --upgrade && \
+    pip3 install setuptools --upgrade && \
+    sudo pip3 install -r requirements.txt && \
+    sudo python3 setup.py install
+
 # Run
 ENTRYPOINT sudo service tor start && \
     sudo service ssh start && \
