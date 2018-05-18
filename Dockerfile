@@ -72,6 +72,31 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
             libcudnn5-dev=$CUDNN_VERSION-1+cuda8.0 && \
     rm -rf /var/lib/apt/lists/*
 
+RUN echo "keyboard-configuration	keyboard-configuration/unsupported_config_layout	boolean	true" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/unsupported_config_layout	boolean	true" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/xkb-keymap	select	" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/unsupported_config_options	boolean	true" | debconf-set-selections && \
+    echo "keyboard-configuration	console-setup/detected	note	" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/unsupported_options	boolean	true" | debconf-set-selections && \
+    echo "keyboard-configuration	console-setup/ask_detect	boolean	false" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/optionscode	string	" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/variant	select	English (US)" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/switch	select	No temporary switch" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/ctrl_alt_bksp	boolean	false" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/toggle	select	No toggling" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/altgr	select	The default for the keyboard layout" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/model	select	Generic 105-key (Intl) PC" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/layout	select	English (US)" | debconf-set-selections && \
+    echo "keyboard-configuration	console-setup/detect	detect-keyboard	" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/compose	select	No compose key" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/modelcode	string	pc105" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/variantcode	string	" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/layoutcode	string	us" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/store_defaults_in_debconf_db	boolean	true" | debconf-set-selections && \
+    echo "keyboard-configuration	keyboard-configuration/unsupported_layout	boolean	true" | debconf-set-selections
+
+ENV DEBIAN_FRONTEND="noninteractive dpkg-reconfigure keyboard-configuration"
+
 ## create non-root user
 RUN apt-get update && apt-get upgrade -y && apt-get install -y sudo
 RUN useradd -ms /bin/bash ubuntu && \
