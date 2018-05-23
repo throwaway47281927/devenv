@@ -286,6 +286,10 @@ RUN sudo service tor start && \
     git pull && \
     python3 download.py
 
+RUN cd ~/openpose && \
+    git checkout f430a7990df915ef92852e4b7744e06eecbd2b61 && \
+    sudo ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
+
 # Run
 ENTRYPOINT sudo service tor start && \
     sudo service ssh start && \
