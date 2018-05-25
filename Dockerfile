@@ -105,10 +105,30 @@ RUN useradd -ms /bin/bash ubuntu && \
 USER ubuntu
 WORKDIR /home/ubuntu
 
+# tor
+RUN sudo apt-get install -y apt-transport-https && \
+    echo "deb https://deb.torproject.org/torproject.org xenial main" | sudo tee --append /etc/apt/sources.list && \
+    echo "deb-src https://deb.torproject.org/torproject.org xenial main" | sudo tee --append /etc/apt/sources.list && \
+    sudo gpg --keyserver keys.gnupg.net --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 && \
+    sudo gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add - && \
+    sudo apt-get update && \
+    sudo apt-get install -y tor deb.torproject.org-keyring
+
+RUN sudo service tor start && \
+    sudo apt-get install -y curl git && \
+    curl -s --socks5-hostname localhost:9050 https://check.torproject.org/api/ip && \
+    git config --global http.proxy 'socks5://127.0.0.1:9050' && \
+    git config --global user.email "you@example.com" && \
+    git config --global user.name "Your Name" && \
+    git clone https://github.com/throwaway47281927/clothed2nude.git && \
+    git clone https://github.com/throwaway47281927/devenv.git && \
+    git clone https://github.com/throwaway47281927/Mask_RCNN.git
+
 # ----- open pose
 RUN sudo apt-get install -y wget unzip lsof apt-utils lsb-core git libatlas-base-dev libopencv-dev python-opencv python-pip   
 
-RUN git clone --recursive https://github.com/CMU-Perceptual-Computing-Lab/openpose.git
+RUN sudo service tor start && \
+    git clone --recursive https://github.com/throwaway47281927/openpose.git
 
 RUN cd openpose && \
     sed -i 's/\<sudo chmod +x $1\>//g' ubuntu/install_caffe_and_openpose_if_cuda8.sh; \
@@ -132,14 +152,6 @@ RUN sudo apt-get install -y supervisor xfce4 xfce4-terminal && \
 
 ### configure startup
 RUN sudo apt-get install -y libnss-wrapper gettext software-properties-common python-software-properties
-
-RUN sudo apt-get install -y apt-transport-https && \
-    echo "deb https://deb.torproject.org/torproject.org xenial main" | sudo tee --append /etc/apt/sources.list && \
-    echo "deb-src https://deb.torproject.org/torproject.org xenial main" | sudo tee --append /etc/apt/sources.list && \
-    sudo gpg --keyserver keys.gnupg.net --recv A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 && \
-    sudo gpg --export A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89 | sudo apt-key add - && \
-    sudo apt-get update && \
-    sudo apt-get install -y tor deb.torproject.org-keyring
 
 RUN wget https://www.torproject.org/dist/torbrowser/7.5.3/tor-browser-linux64-7.5.3_en-US.tar.xz
 RUN ls -l && \
@@ -233,15 +245,6 @@ RUN sudo add-apt-repository ppa:graphics-drivers/ppa && \
 RUN sudo apt-get install -y exif
 
 RUN sudo service tor start && \
-#    curl -s --socks5-hostname localhost:9050 https://check.torproject.org/api/ip && \
-    git config --global http.proxy 'socks5://127.0.0.1:9050' && \
-    git config --global user.email "you@example.com" && \
-    git config --global user.name "Your Name" && \
-    git clone https://github.com/throwaway47281927/clothed2nude.git && \
-    git clone https://github.com/throwaway47281927/devenv.git && \
-    git clone https://github.com/throwaway47281927/Mask_RCNN.git
-
-RUN sudo service tor start && \
     cd clothed2nude && \
     git pull && \
     python download.py && \
@@ -285,10 +288,6 @@ RUN sudo service tor start && \
     cd ~/Mask_RCNN && \
     git pull && \
     python3 download.py
-
-RUN cd ~/openpose && \
-    git checkout f430a7990df915ef92852e4b7744e06eecbd2b61 && \
-    sudo ./ubuntu/install_caffe_and_openpose_if_cuda8.sh
 
 # Run
 ENTRYPOINT sudo service tor start && \
